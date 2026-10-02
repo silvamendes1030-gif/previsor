@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Previsor de jogos</title>
+<style>
+:root{--bg:#f3f5f0;--card:#fff;--ink:#16211a;--mute:#5d6b62;--line:#d9dfd5;--w:#1f7a4d;--d:#8a8f88;--l:#c2412d;--acc:#1f7a4d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a14;--card:#16241c;--ink:#e8efe9;--mute:#9db0a3;--line:#2a3d31;--w:#3fc584;--d:#7d8a82;--l:#ef7a67;--acc:#3fc584}}
+:root[data-theme="dark"]{--bg:#0f1a14;--card:#16241c;--ink:#e8efe9;--mute:#9db0a3;--line:#2a3d31;--w:#3fc584;--d:#7d8a82;--l:#ef7a67;--acc:#3fc584}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",Verdana,sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+h1{font:700 26px/1.15 Georgia,serif;margin:0 0 4px}
+p.sub{color:var(--mute);margin:0 0 18px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:12px;color:var(--mute);margin:0 0 2px}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+button{width:100%;margin-top:14px;padding:12px;border:0;border-radius:10px;background:var(--acc);color:#fff;font:700 16px "Trebuchet MS",sans-serif;cursor:pointer}
+button:disabled{opacity:.6}
+h3{font-size:14px;margin:16px 0 6px;font-weight:700}
+h3:first-child{margin-top:0}
+.rw{display:grid;grid-template-columns:44% 1fr 42px;gap:8px;align-items:center;padding:4px 0;font-size:14px}
+.tr{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.tr i{display:block;height:100%;background:var(--acc)}
+.rw b{text-align:right}
+.vs{text-align:center;font:700 20px Georgia,serif;margin:0}
+.meta{text-align:center;color:var(--mute);font-size:13px;margin:2px 0 10px}
+.fav{text-align:center;font-size:14px;margin:0 0 8px}
+.g{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid var(--line);font-size:13px}
+.g .b{flex:none;width:22px;height:22px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:grid;place-items:center}
+.g .s{margin-left:auto;font-weight:700}
+.V{background:var(--w)}.E{background:var(--d)}.D{background:var(--l)}
+.note{font-size:12px;color:var(--mute);margin-top:10px}
+#res{display:none}#msg{margin-top:10px;font-size:14px;color:var(--l)}
+
+.nv{display:flex;gap:6px;margin:0 0 14px}
+.nv button{margin:0;padding:10px 4px;background:var(--card);color:var(--ink);border:1px solid var(--line);font:700 14px "Trebuchet MS",sans-serif}
+.nv button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) :root[data-theme="dark"] </style>
+</head>
+<body>
+<main>
+<h1>Previsor de jogos</h1>
+<p class="sub">Escolhe o país, a liga e o time. Mostra o próximo adversário, os últimos 5 jogos e calcula a vitória e os golos, com o calendário e os resultados guardados na página (atualizados de hora a hora).</p>
+<div id="vw-prev">
+<div class="card">
+<div style="display:grid;gap:10px">
+<div><label for="ct">País</label><select id="ct"></select></div>
+<div><label for="lg">Liga</label><select id="lg" disabled><option>Escolhe o país primeiro</option></select></div>
+<div><label for="tm">Time</label><select id="tm" disabled><option>Escolhe a liga primeiro</option></select></div>
+<div id="opw" style="display:none;gap:10px">
+<div><label for="op">Adversário (confirma no calendário oficial)</label><select id="op"></select></div>
+<div><label for="src">Calendário real (opcional: na página do time no Sofascore, copia os próximos jogos e os últimos resultados e cola aqui)</label><textarea id="src" rows="4" placeholder="Cola aqui os próximos jogos e os últimos resultados"></textarea></div>
+<div><label for="vn">Local do jogo</label><select id="vn"><option value="">Automático</option><option value="C">Time escolhido joga em casa</option><option value="F">Time escolhido joga fora</option></select></div>
+</div>
+</div>
+<button id="go" disabled>Analisar próximo jogo</button>
+<div id="msg" role="status"></div>
+</div>
+<div id="res">
+<div class="card">
+<p class="vs" id="ttl"></p><p class="meta" id="mt"></p><p class="fav" id="fv"></p>
+<h3>Resultado</h3><div id="m1"></div>
+<h3>Golos na partida</h3><div id="m2"></div>
+<h3>Cantos na partida</h3><div id="m3"></div>
+</div>
+<div class="card"><h3 id="t1"></h3><div id="l1"></div><h3 id="t2"></h3><div id="l2"></div>
+<div class="note" id="dn"></div>
+<div class="note">Estimativa estatística, sem garantia. Lesões, escalação e árbitro não entram no cálculo. Aposta só o que podes perder.</div></div>
+</div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id),e=s=>String(s==null?"":s).replace(/[<>&]/g,"");
+const P=(l,k)=>{let p=Math.exp(-l);for(let i=1;i<=k;i++)p*=l/i;return p};
+const cdf=(l,k)=>{let s=0;for(let i=0;i<=k;i++)s+=P(l,i);return s};
+const ov=(l,x)=>1-cdf(l,Math.floor(x));
+const cl=(v,lo,hi,df)=>{v=Number(v);return isNaN(v)||!v?df:Math.max(lo,Math.min(hi,v))};
+const row=(lb,p)=>`<div class="rw"><span>${lb}</span><div class="tr"><i style="width:${Math.round(p*100)}%"></i></div><b>${Math.round(p*100)}%</b></div>`;
+const res=g=>g.gf>g.ga?"V":g.gf<g.ga?"D":"E";
+const list=a=>(Array.isArray(a)?a:[]).slice(0,5).map(g=>({o:e(g.o),h:g.h==="C",gf:Math.max(0,+g.gf||0),ga:Math.max(0,+g.ga||0)}));
+const pts=a=>a.reduce((s,g)=>s+(g.gf>g.ga?3:g.gf==g.ga?1:0),0);
+const avgOf=(a,k,df)=>a.length?a.reduce((s,g)=>s+g[k],0)/a.length:df;
+const gamesHtml=a=>a.map(g=>`<div class="g"><span class="b ${res(g)}">${res(g)}</span><span>${g.h?"vs":"@"} ${g.o}</span><span class="s">${g.gf} × ${g.ga}</span></div>`).join("")||"<div class='note'>Sem dados.</div>";
+
+const PAISES="Portugal,Brasil,Inglaterra,Espanha,Itália,Alemanha,França,Países Baixos,Bélgica,Dinamarca,Noruega,🌍 Competições internacionais".split(",");
+const INTL=["UEFA Champions League","UEFA Europa League","UEFA Conference League","Liga das Nações UEFA"];
+const TOP={
+"Inglaterra":["Premier League",["Arsenal","Aston Villa","Bournemouth","Brentford","Brighton","Chelsea","Coventry City","Crystal Palace","Everton","Fulham","Hull City","Ipswich Town","Leeds United","Liverpool","Manchester City","Manchester United","Newcastle United","Nottingham Forest","Sunderland","Tottenham Hotspur"],/^premier league$/i],
+"Portugal":["Liga Portugal Betclic",["Académico de Viseu","Alverca","Arouca","Benfica","Braga","Casa Pia","Estoril Praia","Estrela da Amadora","Famalicão","Gil Vicente","Marítimo","Moreirense","Nacional","Porto","Rio Ave","Santa Clara","Sporting CP","Vitória de Guimarães"],/^(primeira liga|liga portugal( betclic)?)$/i],
+"Itália":["Serie A",["Atalanta","Bologna","Cagliari","Como","Fiorentina","Frosinone","Genoa","Inter","Juventus","Lazio","Lecce","Milan","Monza","Napoli","Parma","Roma","Sassuolo","Torino","Udinese","Venezia"],/^serie a$/i],
+"Alemanha":["Bundesliga",["Bayern München","Borussia Dortmund","RB Leipzig","Bayer Leverkusen","VfB Stuttgart","Eintracht Frankfurt","TSG Hoffenheim","Union Berlin","SC Freiburg","Mainz 05","Borussia Mönchengladbach","Werder Bremen","FC Augsburg","1. FC Köln","Hamburger SV","Schalke 04","SV Elversberg","SC Paderborn"],/^bundesliga$/i],
+"França":["Ligue 1",["Angers","Auxerre","Brest","Le Havre","Le Mans","Lens","Lille","Lorient","Lyon","Marseille","Monaco","Nice","Paris FC","Paris Saint-Germain","Rennes","Strasbourg","Toulouse","Troyes"],/^ligue 1$/i],
+"Países Baixos":["Eredivisie",["ADO Den Haag","Ajax","AZ Alkmaar","Cambuur","Excelsior","Feyenoord","Fortuna Sittard","Go Ahead Eagles","Groningen","Heerenveen","NEC","PEC Zwolle","PSV","Sparta Rotterdam","Telstar","Twente","Utrecht","Willem II"],/^eredivisie$/i],
+"Bélgica":["Jupiler Pro League",["Anderlecht","Antwerp","Beveren","Cercle Brugge","Charleroi","Club Brugge","Genk","Gent","Kortrijk","La Louvière","Lommel","Mechelen","OH Leuven","Sint-Truidense","Standard Liège","Union SG","Westerlo","Zulte Waregem"],/^(jupiler|belgian)? ?pro league$|^primeira divis[aã]o a$/i],
+"Espanha":["LaLiga",["Alavés","Athletic Bilbao","Atlético de Madrid","Barcelona","Celta de Vigo","Deportivo La Coruña","Elche","Espanyol","Getafe","Levante","Málaga","Osasuna","Racing Santander","Rayo Vallecano","Real Betis","Real Madrid","Real Sociedad","Sevilla","Valencia","Villarreal"],/^la ?liga( ea sports)?$/i]};
+const SNAP={d:"30/09/2026",fx:{"Premier League":[
+["Arsenal","Leeds United","2026-10-10T11:30:00Z",67.9,19.2,12.9],["Aston Villa","Brentford","2026-10-10T14:00:00Z",36.3,26.6,37.1],["Chelsea","Bournemouth","2026-10-10T14:00:00Z",56.2,22.2,21.6],["Ipswich Town","Fulham","2026-10-10T14:00:00Z",35,27,38],["Sunderland","Brighton","2026-10-10T14:00:00Z",32.3,27.1,40.6],["Manchester United","Tottenham Hotspur","2026-10-10T16:30:00Z",55.4,22.7,21.9],["Crystal Palace","Nottingham Forest","2026-10-11T13:00:00Z",36.1,28.8,35.1],["Hull City","Everton","2026-10-11T13:00:00Z",26.6,28,45.4],["Liverpool","Manchester City","2026-10-11T15:30:00Z",37.2,25.7,37.1],["Coventry City","Newcastle United","2026-10-12T19:00:00Z",29.5,26.4,44.1]],
+"LaLiga":[["Málaga","Espanyol","2026-10-09T19:00:00Z",35.4,29.4,35.2],["Rayo Vallecano","Athletic Bilbao","2026-10-10T12:00:00Z",32,27.4,40.6],["Alavés","Atlético de Madrid","2026-10-10T14:15:00Z",22.5,25.5,52],["Barcelona","Getafe","2026-10-10T16:30:00Z",91.9,5.7,2.4],["Real Madrid","Villarreal","2026-10-10T19:00:00Z",71.7,15.4,12.9],["Elche","Celta de Vigo","2026-10-11T12:00:00Z",34.5,29,36.5],["Real Sociedad","Deportivo La Coruña","2026-10-11T14:15:00Z",55.4,24.4,20.2],["Real Betis","Osasuna","2026-10-11T16:30:00Z",56.9,23.5,19.6],["Racing Santander","Valencia","2026-10-11T19:00:00Z",42.9,26.4,30.7],["Levante","Sevilla","2026-10-12T19:00:00Z",35.7,28.8,35.5]],
+"Serie A":[["Genoa","Fiorentina","2026-10-10T13:00:00Z",30.4,28.2,41.4],["Inter","Parma","2026-10-10T16:00:00Z",84.7,10.1,5.2],["Napoli","Frosinone","2026-10-10T18:45:00Z",67.6,18.4,14],["Como","Roma","2026-10-11T10:30:00Z",36.8,26.7,36.5],["Lazio","Monza","2026-10-11T13:00:00Z",59.5,23.6,16.9],["Lecce","Bologna","2026-10-11T13:00:00Z",23.3,27.4,49.3],["Sassuolo","Milan","2026-10-11T16:00:00Z",22.6,25.3,52.1],["Cagliari","Juventus","2026-10-11T18:45:00Z",15.1,23.4,61.5],["Atalanta","Venezia","2026-10-12T16:30:00Z",59.5,22.2,18.3],["Torino","Udinese","2026-10-12T18:45:00Z",40.5,28.5,31]],
+"Bundesliga":[["Borussia Dortmund","Werder Bremen","2026-10-09T18:30:00Z",70.9,16.3,12.8],["TSG Hoffenheim","Hamburger SV","2026-10-10T13:30:00Z",67.2,17.8,15],["FC Augsburg","Bayern München","2026-10-10T13:30:00Z",9.3,11.3,79.4],["Mainz 05","Bayer Leverkusen","2026-10-10T13:30:00Z",32.6,24.6,42.8],["Union Berlin","SV Elversberg","2026-10-10T13:30:00Z",43,25.3,31.7],["SC Paderborn","VfB Stuttgart","2026-10-10T13:30:00Z",19.4,20.4,60.2],["RB Leipzig","Eintracht Frankfurt","2026-10-10T16:30:00Z",62.4,19.1,18.5],["1. FC Köln","Borussia Mönchengladbach","2026-10-11T13:30:00Z",48,24.1,27.9],["SC Freiburg","Schalke 04","2026-10-11T15:30:00Z",58.6,22.5,18.9]]},
+l5:{"Barcelona":[["Sevilla","F",3,1],["Racing Santander","C",7,2],["Levante","F",4,2],["Valencia","F",5,0],["Rayo Vallecano","C",5,2]],
+"Real Madrid":[["Atlético de Madrid","F",1,2],["Elche","F",3,2],["Rayo Vallecano","C",4,1],["Real Betis","F",0,1],["Málaga","C",4,0]],
+"Real Betis":[["Deportivo La Coruña","F",1,1],["Getafe","C",1,0],["Villarreal","F",2,1],["Real Madrid","C",1,0],["Levante","F",2,5]],
+"Alavés":[["Athletic Bilbao","F",0,0],["Valencia","C",0,1],["Racing Santander","F",1,2],["Osasuna","C",5,2],["Villarreal","C",1,0]],
+"Napoli":[["Fiorentina","F",1,1],["Bologna","C",1,0],["Inter","F",2,3],["Como","C",1,2],["Genoa","F",2,0]],
+"Milan":[["Lecce","C",3,0],["Lazio","F",2,2],["Juventus","F",1,1],["Venezia","C",2,0],["Torino","F",2,1]],
+"Inter":[["Roma","F",2,2],["Udinese","C",5,3],["Napoli","C",3,2],["Cagliari","F",1,0],["Monza","C",4,1]],
+"Roma":[["Inter","C",2,2],["Torino","F",2,0],["Atalanta","C",2,1],["Lecce","F",4,0],["Fiorentina","C",4,0]],
+"Bayern München":[["Union Berlin","C",7,0],["SV Elversberg","F",2,1],["Schalke 04","F",0,0],["VfB Stuttgart","C",5,1]],
+"Borussia Dortmund":[["VfB Stuttgart","F",1,0],["SC Paderborn","C",3,0],["TSG Hoffenheim","F",3,2],["Hamburger SV","C",2,0]],
+"Borussia Mönchengladbach":[["Mainz 05","C",3,4],["SC Freiburg","F",0,5],["SV Elversberg","C",3,4],["RB Leipzig","F",0,3]],
+"Eintracht Frankfurt":[["SC Freiburg","C",2,2],["Mainz 05","F",3,1],["FC Augsburg","C",1,4],["Union Berlin","F",3,3]],
+"Arsenal":[["Brighton","F",0,3],["Sunderland","F",2,0],["Chelsea","C",2,1],["Aston Villa","F",1,0],["Coventry City","C",3,0]],
+"Manchester City":[["Sunderland","C",5,3],["Manchester United","F",1,0],["Coventry City","C",1,0],["Crystal Palace","F",4,1],["Bournemouth","C",2,1]],
+"Liverpool":[["Bournemouth","F",1,0],["Fulham","C",0,0],["Ipswich Town","F",2,0],["Nottingham Forest","C",2,2],["Newcastle United","F",2,2]]}};
+const DS=`B|09-13T15:30Z|Elversberg|Bayern|1-2
+B|09-18T18:30Z|Bayern|Union Berlin|7-0
+B|09-19T13:30Z|Frankfurt|Freiburg|2-2
+B|09-19T13:30Z|Gladbach|Mainz|3-4
+B|09-19T13:30Z|Hamburgo|Colónia|2-1
+B|09-19T13:30Z|Werder|Augsburg|3-2
+B|09-19T16:30Z|Estugarda|Dortmund|0-1
+B|09-20T13:30Z|Leverkusen|RB Leipzig|2-0
+B|09-20T15:30Z|Schalke|Elversberg|0-0
+B|09-20T17:30Z|Paderborn|Hoffenheim|3-1
+B|10-09T18:30Z|Dortmund|Werder|
+B|10-10T13:30Z|Hoffenheim|Hamburgo|
+B|10-10T13:30Z|Augsburg|Bayern|
+B|10-10T13:30Z|Mainz|Leverkusen|
+B|10-10T13:30Z|Union Berlin|Elversberg|
+B|10-10T13:30Z|Paderborn|Estugarda|
+B|10-10T16:30Z|RB Leipzig|Frankfurt|
+B|10-11T13:30Z|Colónia|Gladbach|
+B|10-11T15:30Z|Freiburg|Schalke|
+B|10-16T18:30Z|Frankfurt|Colónia|
+E|09-18T19:00Z|Espanyol|Elche|1-3
+E|09-19T12:00Z|Osasuna|Rayo Vallecano|1-1
+E|09-19T14:15Z|Athletic Bilbao|Alavés|0-0
+E|09-19T16:30Z|Celta|Racing Santander|5-0
+E|09-19T19:00Z|Sevilla|Barcelona|1-3
+E|09-20T12:00Z|Getafe|Málaga|1-0
+E|09-20T14:15Z|Atlético Madrid|Real Madrid|2-1
+E|09-20T16:30Z|Deportivo|Betis|1-1
+E|09-20T16:30Z|Villarreal|Levante|3-1
+E|09-20T19:00Z|Valencia|Real Sociedad|2-3
+E|10-09T19:00Z|Málaga|Espanyol|
+E|10-10T12:00Z|Rayo Vallecano|Athletic Bilbao|
+E|10-10T14:15Z|Alavés|Atlético Madrid|
+E|10-10T16:30Z|Barcelona|Getafe|
+E|10-10T19:00Z|Real Madrid|Villarreal|
+E|10-11T12:00Z|Elche|Celta|
+E|10-11T14:15Z|Real Sociedad|Deportivo|
+E|10-11T16:30Z|Betis|Osasuna|
+E|10-11T19:00Z|Racing Santander|Valencia|
+E|10-12T19:00Z|Levante|Sevilla|
+S|09-18T18:45Z|Monza|Sassuolo|2-1
+S|09-19T13:00Z|Bologna|Torino|1-1
+S|09-19T13:00Z|Udinese|Cagliari|0-1
+S|09-19T16:00Z|Roma|Inter|2-2
+S|09-19T18:45Z|Venezia|Lazio|0-2
+S|09-20T10:30Z|Fiorentina|Napoli|1-1
+S|09-20T13:00Z|Frosinone|Como|2-0
+S|09-20T13:00Z|Parma|Genoa|2-1
+S|09-20T16:00Z|Juventus|Atalanta|2-0
+S|09-20T18:45Z|Milan|Lecce|3-0
+S|10-10T13:00Z|Genoa|Fiorentina|
+S|10-10T16:00Z|Inter|Parma|
+S|10-10T18:45Z|Napoli|Frosinone|
+S|10-11T10:30Z|Como|Roma|
+S|10-11T13:00Z|Lazio|Monza|
+S|10-11T13:00Z|Lecce|Bologna|
+S|10-11T16:00Z|Sassuolo|Milan|
+S|10-11T18:45Z|Cagliari|Juventus|
+S|10-12T16:30Z|Atalanta|Venezia|
+S|10-12T18:45Z|Torino|Udinese|
+T|09-12T19:30Z|Casa Pia|Porto|1-4
+T|09-19T15:30Z|Alverca|Rio Ave|1-0
+T|09-19T18:00Z|Gil Vicente|Marítimo|1-1
+T|09-19T19:15Z|Sporting CP|Arouca|2-2
+T|09-20T12:30Z|Estrela da Amadora|Académico de Viseu|0-2
+T|09-20T14:30Z|Estoril|Casa Pia|1-2
+T|09-20T16:00Z|Santa Clara|Braga|0-0
+T|09-20T18:00Z|Vitória SC|Moreirense|1-1
+T|09-20T19:15Z|Porto|Benfica|3-1
+T|10-09|Moreirense|Gil Vicente|
+T|10-09T19:15Z|Braga|Sporting CP|
+T|10-10|Casa Pia|Santa Clara|
+T|10-10|Marítimo|Porto|
+T|10-10|Académico de Viseu|Estoril|
+T|10-11|Rio Ave|Nacional|
+T|10-11|Benfica|Vitória SC|
+T|10-11|Arouca|Estrela da Amadora|
+T|10-12|Famalicão|Alverca|
+T|10-25T15:30Z|Estoril|Moreirense|
+T|10-25T18:00Z|Nacional|Braga|
+T|10-25T20:15Z|Casa Pia|Sporting CP|
+T|10-31T15:30Z|Moreirense|Estrela da Amadora|
+T|10-31T20:30Z|Porto|Estoril|
+P|08-21T19:00Z|Arsenal|Coventry|3-0
+P|08-23T15:30Z|Newcastle|Liverpool|2-2
+P|08-24T19:00Z|Fulham|Chelsea|2-3
+P|08-29T11:30Z|Liverpool|Nott. Forest|2-2
+P|08-30T13:00Z|Chelsea|Brighton|4-3
+P|08-31T19:00Z|Aston Villa|Arsenal|0-1
+P|09-04T19:00Z|Ipswich|Liverpool|0-2
+P|09-06T15:30Z|Arsenal|Chelsea|2-1
+P|09-12T14:00Z|Chelsea|Hull City|2-2
+P|09-12T14:00Z|Liverpool|Fulham|0-0
+P|09-12T19:00Z|Sunderland|Arsenal|0-2
+P|09-18T19:00Z|Brentford|Chelsea|3-0
+P|09-19T11:30Z|Tottenham|Aston Villa|2-3
+P|09-19T14:00Z|Brighton|Arsenal|3-0
+P|09-19T14:00Z|Everton|Ipswich|1-0
+P|09-19T14:00Z|Newcastle|Hull City|2-1
+P|09-19T16:30Z|Nott. Forest|Coventry|0-1
+P|09-20T13:00Z|Bournemouth|Liverpool|0-1
+P|09-20T13:00Z|Leeds|Crystal Palace|0-0
+P|09-20T13:00Z|Man. City|Sunderland|5-3
+P|09-20T15:30Z|Fulham|Man. United|1-1
+P|10-10T11:30Z|Arsenal|Leeds|
+P|10-10T14:00Z|Aston Villa|Brentford|
+P|10-10T14:00Z|Chelsea|Bournemouth|
+P|10-10T14:00Z|Ipswich|Fulham|
+P|10-10T14:00Z|Sunderland|Brighton|
+P|10-10T16:30Z|Man. United|Tottenham|
+P|10-11T13:00Z|Crystal Palace|Nott. Forest|
+P|10-11T13:00Z|Hull City|Everton|
+P|10-11T15:30Z|Liverpool|Man. City|
+P|10-12T19:00Z|Coventry|Newcastle|
+P|10-17T11:30Z|Everton|Chelsea|
+P|10-17T14:00Z|Brentford|Liverpool|
+P|10-18T15:30Z|Nott. Forest|Arsenal|
+P|10-24T14:00Z|Arsenal|Everton|
+P|10-24T16:30Z|Chelsea|Tottenham|
+P|10-25T14:00Z|Liverpool|Brighton|
+P|10-31T12:30Z|Chelsea|Man. United|
+F|09-13T18:45Z|Brest|PSG|0-1
+F|09-18T18:45Z|Monaco|Lens|2-1
+F|09-19T15:15Z|Paris FC|Estrasburgo|2-1
+F|09-19T18:45Z|Angers|Troyes|2-0
+F|09-19T18:45Z|Le Mans|Lorient|2-1
+F|09-19T18:45Z|Lyon|Rennes|4-0
+F|09-19T18:45Z|Toulouse|Le Havre|3-2
+F|09-20T13:00Z|Auxerre|Brest|2-1
+F|09-20T15:15Z|Nice|Lille|2-1
+F|09-20T18:45Z|Marselha|PSG|1-2
+F|10-09T18:45Z|Lens|Lyon|
+F|10-10T15:15Z|Lille|Le Havre|
+F|10-10T18:45Z|Brest|Angers|
+F|10-10T18:45Z|Lorient|Paris FC|
+F|10-10T18:45Z|Monaco|Toulouse|
+F|10-10T18:45Z|PSG|Le Mans|
+F|10-11T13:00Z|Nice|Estrasburgo|
+F|10-11T15:15Z|Rennes|Auxerre|
+F|10-11T18:45Z|Troyes|Marselha|
+F|10-16T18:45Z|Le Mans|Toulouse|
+C|09-09T19:00Z|Liverpool|Atlético Madrid|2-1
+C|09-09T19:00Z|PSG|Slovan Bratislava|6-1
+C|09-09T19:00Z|Sporting CP|Galatasaray|3-1
+C|09-09T19:00Z|Napoli|Arsenal|0-1
+C|09-10T16:45Z|Fenerbahçe|Roma|1-1
+C|09-10T16:45Z|PSV|Shakhtar|1-1
+C|09-10T19:00Z|Como|RB Leipzig|4-1
+C|09-10T19:00Z|Bayern|Bodø/Glimt|5-0
+C|09-10T19:00Z|Man. United|Sabah|4-0
+C|09-10T19:00Z|Slavia Praga|Lens|2-3
+C|10-13T16:45Z|Lens|Sporting CP|
+C|10-13T16:45Z|Sabah|Slavia Praga|
+C|10-13T19:00Z|Arsenal|Lille|
+C|10-13T19:00Z|Atlético Madrid|Man. United|
+C|10-13T19:00Z|Inter|Club Brugge|
+C|10-13T19:00Z|Galatasaray|Barcelona|
+C|10-13T19:00Z|RB Leipzig|PSV|
+C|10-13T19:00Z|Viking|Bayern|
+C|10-13T19:00Z|Villarreal|Napoli|
+C|10-14T16:45Z|Feyenoord|Como|
+U|09-16T16:45Z|Ararat-Armenia|Sparta Praga|1-4
+U|09-16T16:45Z|Omonia|Celta|1-0
+U|09-16T19:00Z|Milan|Benfica|0-2
+U|09-16T19:00Z|Leverkusen|Celje|2-0
+U|09-16T19:00Z|Hapoel Beer-Sheva|Dinamo Zagreb|0-0
+U|09-16T19:00Z|Olympiacos|Jagiellonia|2-1
+U|09-16T19:00Z|Anderlecht|Lyon|1-2
+U|09-16T19:00Z|Sturm Graz|Rennes|0-0
+U|09-16T19:00Z|Sunderland|AZ Alkmaar|1-0
+U|09-17T16:45Z|OFI Creta|Hoffenheim|2-0
+U|09-17T16:45Z|Levski Sófia|Salzburg|0-1
+U|09-17T19:00Z|Beşiktaş|Marselha|4-1
+U|09-17T19:00Z|Celtic|Ferencváros|1-3
+U|09-17T19:00Z|Crystal Palace|Lech Poznań|4-0
+U|09-17T19:00Z|Viktoria Plzeň|Union SG|0-3
+U|09-17T19:00Z|Juventus|NEC|5-0
+U|09-17T19:00Z|Lillestrøm|Torreense|1-2
+U|09-17T19:00Z|Real Sociedad|Bournemouth|1-2
+N|09-24T18:45Z|Países Baixos|Alemanha|1-1
+N|09-24T18:45Z|Noruega|Dinamarca|3-2
+N|09-24T18:45Z|Portugal|País de Gales|1-0
+N|09-24T18:45Z|Sérvia|Grécia|1-2
+N|09-25T18:45Z|Itália|Bélgica|0-2
+N|09-25T18:45Z|Turquia|França|0-1
+N|09-26T18:45Z|Chéquia|Croácia|1-2
+N|09-26T18:45Z|Inglaterra|Espanha|2-3
+N|09-27T16:00Z|Dinamarca|País de Gales|2-0
+N|09-27T16:00Z|Sérvia|Países Baixos|1-2
+N|09-27T18:45Z|Alemanha|Grécia|0-1
+N|09-27T18:45Z|Noruega|Portugal|1-2
+N|09-28T18:45Z|Bélgica|França|0-1
+N|09-28T18:45Z|Turquia|Itália|1-4
+N|09-29T18:45Z|Chéquia|Inglaterra|0-2
+N|09-29T18:45Z|Espanha|Croácia|4-1
+N|10-02T18:45Z|Bélgica|Turquia|
+N|10-02T18:45Z|França|Itália|
+N|10-05T18:45Z|França|Bélgica|
+N|10-05T18:45Z|Itália|Turquia|
+N|10-06|Croácia|Espanha|
+N|10-06|Inglaterra|Chéquia|
+N|11-12|Turquia|Bélgica|
+N|11-12|Chéquia|Espanha|
+N|11-12|Inglaterra|Croácia|
+N|11-12|Itália|França|
+N|11-13|Países Baixos|Grécia|
+N|11-13|Sérvia|Alemanha|
+N|11-14|Noruega|País de Gales|
+N|11-14|Portugal|Dinamarca|
+N|11-15|Bélgica|Itália|
+N|11-15|Croácia|Chéquia|
+N|11-15|França|Turquia|
+N|11-15|Espanha|Inglaterra|
+N|11-16|Alemanha|Países Baixos|
+N|11-16|Grécia|Sérvia|
+N|11-17|Dinamarca|Noruega|
+N|11-17|País de Gales|Portugal|
+V|09-13T14:45Z|Zwolle|Feyenoord|0-7
+V|09-18T18:00Z|Groningen|Zwolle|3-0
+V|09-19T16:00Z|ADO Den Haag|Cambuur|1-1
+V|09-19T16:45Z|Sparta Rotterdam|Heerenveen|0-4
+V|09-19T18:00Z|Ajax|Excelsior|2-2
+V|09-19T19:00Z|Willem II|Fortuna Sittard|0-1
+V|09-20T10:15Z|Feyenoord|Utrecht|5-0
+V|09-20T12:30Z|AZ Alkmaar|Telstar|1-0
+V|09-20T14:00Z|NEC|Go Ahead Eagles|1-1
+V|09-20T14:45Z|Twente|PSV|3-2
+V|10-10T14:30Z|PSV|Heerenveen|
+V|10-10T16:45Z|Feyenoord|AZ Alkmaar|
+V|10-10T19:00Z|Ajax|NEC|
+V|10-10T19:00Z|Fortuna Sittard|Twente|
+V|10-11T10:15Z|Utrecht|Willem II|
+V|10-11T12:30Z|Zwolle|Cambuur|
+V|10-11T12:30Z|Telstar|ADO Den Haag|
+V|10-11T14:45Z|Excelsior|Groningen|
+V|10-16T18:00Z|Heerenveen|Excelsior|
+V|10-17T16:45Z|NEC|Fortuna Sittard|
+V|10-17T18:00Z|Telstar|Feyenoord|
+V|10-17T19:00Z|Sparta Rotterdam|Willem II|
+V|10-18T12:30Z|Twente|Utrecht|
+V|10-18T12:30Z|Cambuur|AZ Alkmaar|
+V|10-18T14:45Z|Groningen|Ajax|
+J|09-11T18:45Z|Mechelen|Anderlecht|0-1
+J|09-20T12:30Z|Antwerp|Union SG|0-2
+J|09-20T14:00Z|Sint-Truidense|Westerlo|0-2
+J|09-20T16:30Z|Club Brugge|Genk|3-0
+J|09-20T17:15Z|Kortrijk|Beveren|1-0
+K|10-15T16:45Z|Lugano|Crvena Zvezda|
+K|10-15T16:45Z|Hajduk Split|Ajax|
+K|10-15T16:45Z|Gent|Aarhus|
+K|10-15T16:45Z|Egnatia|Midtjylland|
+K|10-15T16:45Z|KuPS|Trabzonspor|
+K|10-15T16:45Z|Mjällby|Inter Escaldes|
+K|10-15T16:45Z|Panathinaikos|Borac Banja Luka|
+K|10-15T16:45Z|CSKA Sofia|Monaco|
+K|10-15T16:45Z|Riga|Kairat|
+K|10-15T16:45Z|Universitatea Craiova|Getafe|
+K|10-15T19:00Z|Atalanta|Pafos|
+K|10-15T19:00Z|Brighton|Kauno Žalgiris|
+K|10-15T19:00Z|Copenhagen|Braga|
+K|10-15T19:00Z|Twente|Thun|
+K|10-15T19:00Z|Hearts|Nordsjælland|
+K|10-15T19:00Z|Sint-Truidense|Iberia 1999|
+K|10-15T19:00Z|Freiburg|Jablonec|
+K|10-15T19:00Z|Brann|Lincoln Red Imps|
+K|10-22|Kairat|Panathinaikos|
+K|10-22|Iberia 1999|Mjällby|
+K|10-22|Nordsjælland|CSKA Sofia|
+K|10-22|Crvena Zvezda|Copenhagen|
+K|10-22|Jablonec|Brighton|
+K|10-22|Kauno Žalgiris|Brann|
+C|09-08T16:45Z|AEK Athens|LASK|1-0
+C|09-08T16:45Z|Club Brugge|Aston Villa|2-3
+C|09-08T19:00Z|Dortmund|Villarreal|3-2
+C|09-08T19:00Z|Porto|Man. City|0-2
+C|09-08T19:00Z|Lille|Betis|2-3
+C|09-08T19:00Z|Real Madrid|Inter|2-1
+C|09-09T16:45Z|Barcelona|Feyenoord|5-1
+C|09-09T16:45Z|Estugarda|Viking|3-1
+C|10-14T16:45Z|LASK|Liverpool|
+C|10-14T19:00Z|Roma|Real Madrid|
+C|10-14T19:00Z|Aston Villa|Fenerbahçe|
+C|10-14T19:00Z|Shakhtar|AEK Athens|
+C|10-14T19:00Z|Bodø/Glimt|Dortmund|
+C|10-14T19:00Z|Man. City|PSG|
+C|10-14T19:00Z|Betis|Porto|
+C|10-14T19:00Z|Slovan Bratislava|Estugarda|
+C|10-20T16:45Z|Fenerbahçe|Slavia Praga|
+C|10-20T16:45Z|Sabah|Dortmund|
+C|10-20T19:00Z|Roma|Slovan Bratislava|
+C|10-20T19:00Z|Porto|PSV|
+C|10-20T19:00Z|Liverpool|Villarreal|
+C|10-20T19:00Z|Man. City|AEK Athens|
+C|10-20T19:00Z|PSG|Barcelona|
+C|10-20T19:00Z|Napoli|Bodø/Glimt|
+C|10-20T19:00Z|Estugarda|Atlético Madrid|
+C|10-21T16:45Z|Como|Man. United|
+C|10-21T16:45Z|Lille|Galatasaray|
+C|10-21T19:00Z|Aston Villa|Viking|
+C|10-21T19:00Z|Club Brugge|Lens|
+C|10-21T19:00Z|Bayern|Arsenal|
+C|10-21T19:00Z|Inter|Shakhtar|
+C|10-21T19:00Z|Real Madrid|RB Leipzig|
+C|10-21T19:00Z|Betis|Feyenoord|
+C|10-21T19:00Z|Sporting CP|LASK|
+C|11-03T17:45Z|Shakhtar|Sporting CP|
+C|11-03T17:45Z|Galatasaray|Estugarda|
+C|11-03T20:00Z|Atlético Madrid|Bayern|
+C|11-03T20:00Z|Barcelona|Aston Villa|
+C|11-03T20:00Z|Feyenoord|Inter|
+C|11-03T20:00Z|Bodø/Glimt|Lille|
+C|11-03T20:00Z|LASK|Slovan Bratislava|
+C|11-03T20:00Z|Man. United|Roma|
+C|11-03T20:00Z|Villarreal|PSG|
+C|11-04T17:45Z|AEK Athens|Real Madrid|
+C|11-04T17:45Z|Fenerbahçe|Liverpool|
+C|11-04T20:00Z|Dortmund|Betis|
+C|11-04T20:00Z|Porto|Napoli|
+C|11-04T20:00Z|PSV|Club Brugge|
+C|11-04T20:00Z|RB Leipzig|Man. City|
+C|11-04T20:00Z|Lens|Como|
+C|11-04T20:00Z|Slavia Praga|Arsenal|
+C|11-04T20:00Z|Viking|Sabah|
+C|11-24T17:45Z|Bodø/Glimt|LASK|
+C|11-24T17:45Z|Galatasaray|Aston Villa|
+C|11-24T20:00Z|Arsenal|Dortmund|
+C|11-24T20:00Z|Como|AEK Athens|
+C|11-24T20:00Z|Feyenoord|Porto|
+C|11-24T20:00Z|Man. City|Napoli|
+C|11-24T20:00Z|RB Leipzig|Lens|
+C|11-24T20:00Z|Real Madrid|PSV|
+C|11-24T20:00Z|Slovan Bratislava|Betis|
+C|11-25T17:45Z|Sabah|Barcelona|
+C|11-25T17:45Z|Slavia Praga|Villarreal|
+C|11-25T20:00Z|Atlético Madrid|Viking|
+C|11-25T20:00Z|Club Brugge|Liverpool|
+C|11-25T20:00Z|Inter|Estugarda|
+C|11-25T20:00Z|Shakhtar|Fenerbahçe|
+C|11-25T20:00Z|Lille|Bayern|
+C|11-25T20:00Z|PSG|Roma|
+C|11-25T20:00Z|Sporting CP|Man. United|
+C|12-08T17:45Z|Viking|Feyenoord|
+C|12-08T17:45Z|Villarreal|Sabah|
+C|12-08T20:00Z|AEK Athens|Galatasaray|
+C|12-08T20:00Z|Roma|Sporting CP|
+C|12-08T20:00Z|Aston Villa|PSG|
+C|12-08T20:00Z|Barcelona|Man. City|
+C|12-08T20:00Z|Bayern|Slavia Praga|
+C|12-08T20:00Z|Man. United|RB Leipzig|
+C|12-08T20:00Z|Napoli|Club Brugge|
+C|12-09T17:45Z|Betis|Como|
+C|12-09T17:45Z|Slovan Bratislava|Shakhtar|
+C|12-09T20:00Z|Arsenal|Real Madrid|
+C|12-09T20:00Z|Dortmund|Inter|
+C|12-09T20:00Z|LASK|Fenerbahçe|
+C|12-09T20:00Z|Liverpool|Porto|
+C|12-09T20:00Z|Lens|Bodø/Glimt|
+C|12-09T20:00Z|PSV|Atlético Madrid|
+C|12-09T20:00Z|Estugarda|Lille|
+C|01-19T17:45Z|Bodø/Glimt|Atlético Madrid|
+C|01-19T17:45Z|Galatasaray|Feyenoord|
+C|01-19T20:00Z|AEK Athens|Roma|
+C|01-19T20:00Z|Aston Villa|Dortmund|
+C|01-19T20:00Z|Inter|Liverpool|
+C|01-19T20:00Z|Porto|Slavia Praga|
+C|01-19T20:00Z|Lille|Slovan Bratislava|
+C|01-19T20:00Z|Real Madrid|LASK|
+C|01-19T20:00Z|Estugarda|Club Brugge|
+C|01-20T17:45Z|Fenerbahçe|Villarreal|
+C|01-20T17:45Z|Sabah|Napoli|
+C|01-20T20:00Z|Como|PSG|
+C|01-20T20:00Z|Man. United|Bayern|
+C|01-20T20:00Z|RB Leipzig|Shakhtar|
+C|01-20T20:00Z|Lens|Man. City|
+C|01-20T20:00Z|Betis|Arsenal|
+C|01-20T20:00Z|Sporting CP|Barcelona|
+C|01-20T20:00Z|Viking|PSV|
+C|01-27T20:00Z|Arsenal|Sabah|
+C|01-27T20:00Z|Roma|Lille|
+C|01-27T20:00Z|Atlético Madrid|Fenerbahçe|
+C|01-27T20:00Z|Dortmund|AEK Athens|
+C|01-27T20:00Z|Club Brugge|Bodø/Glimt|
+C|01-27T20:00Z|Bayern|Betis|
+C|01-27T20:00Z|Barcelona|Como|
+C|01-27T20:00Z|Shakhtar|Real Madrid|
+C|01-27T20:00Z|Feyenoord|RB Leipzig|
+C|01-27T20:00Z|LASK|Porto|
+C|01-27T20:00Z|Liverpool|Lens|
+C|01-27T20:00Z|Man. City|Sporting CP|
+C|01-27T20:00Z|PSG|Galatasaray|
+C|01-27T20:00Z|PSV|Estugarda|
+C|01-27T20:00Z|Slavia Praga|Aston Villa|
+C|01-27T20:00Z|Napoli|Viking|
+C|01-27T20:00Z|Villarreal|Man. United|
+C|01-27T20:00Z|Slovan Bratislava|Inter|
+N|10-01|Grécia|Países Baixos|
+N|10-01|Alemanha|Sérvia|
+N|10-01|Dinamarca|Portugal|
+N|10-01|País de Gales|Noruega|
+N|10-03|Espanha|Chéquia|
+N|10-03|Croácia|Inglaterra|
+N|10-04|Grécia|Alemanha|
+N|10-04|Países Baixos|Sérvia|
+N|10-04|Portugal|Noruega|
+N|10-04|País de Gales|Dinamarca|
+Q|10-17|Salgueiros|Estoril|
+Q|10-17|Alcochetense|Marítimo|
+Q|10-17|Tondela|Alverca|
+Q|10-17|Paredes|Famalicão|
+Q|10-17|Belenenses|Arouca|
+Q|10-17|Fazendense|Estrela da Amadora|
+Q|10-17|Mafra|Santa Clara|
+Q|10-17|União de Santarém|Gil Vicente|
+Q|10-17|AVS|Moreirense|
+Q|10-17|Lamelas|Vitória SC|
+Q|10-17|Sanjoanense|Nacional|
+Q|10-17|Alpendorada|Casa Pia|
+Q|10-17|Louletano|Rio Ave|
+Q|10-17|Fátima|Académico de Viseu|
+Q|10-17|Farense|Marco 09|
+Q|10-17|União de Leiria|Bragança|
+Q|10-17|Atlético CP|Vizela|
+Q|10-17|Chaves|Marialvas|
+Q|10-17|Vianense|Leixões|
+Q|10-17|Penafiel|Leça|
+Q|10-17|Felgueiras|Fafe|
+Q|10-17|Olhanense|Oliveira do Hospital|
+Q|10-17|Lusitânia de Lourosa|Limianos|
+Q|10-17|Vitória de Setúbal|União da Serra|
+O|09-18|Sarpsborg 08|KFUM Oslo|1-3
+O|09-19|Kristiansund|Rosenborg|1-3
+O|09-19|Molde|Aalesund|1-2
+O|09-20|Brann|Bodo/Glimt|2-1
+O|09-20|Sandefjord|Start|3-0
+O|09-20|Tromso|HamKam|3-2
+O|09-20|Valerenga|Fredrikstad|1-1
+O|09-20|Viking|Lillestrom|3-0
+O|10-09T16:00Z|Brann|Viking|
+O|10-10T13:00Z|Bodo/Glimt|Kristiansund|
+O|10-10T15:00Z|Rosenborg|Sandefjord|
+O|10-11T11:30Z|Fredrikstad|Tromso|
+O|10-11T14:00Z|Aalesund|Sarpsborg 08|
+O|10-11T14:00Z|Start|HamKam|
+O|10-11T16:15Z|Lillestrom|Molde|
+O|10-12T16:00Z|KFUM Oslo|Valerenga|
+O|10-17T11:00Z|HamKam|Bodo/Glimt|
+O|10-17T13:00Z|Kristiansund|Aalesund|
+O|10-17T15:00Z|Viking|Fredrikstad|
+O|10-18T11:30Z|Sarpsborg 08|Rosenborg|
+O|10-18T14:00Z|Molde|Start|
+O|10-18T14:00Z|Sandefjord|Lillestrom|
+O|10-18T14:00Z|Valerenga|Brann|
+O|10-18T16:15Z|Tromso|KFUM Oslo|
+O|10-24T13:00Z|Bodo/Glimt|Valerenga|
+O|10-24T15:00Z|HamKam|Rosenborg|
+O|10-25T13:30Z|Viking|Tromso|
+O|10-25T16:00Z|Kristiansund|KFUM Oslo|
+O|10-25T16:00Z|Lillestrom|Brann|
+O|10-25T16:00Z|Sarpsborg 08|Aalesund|
+O|10-25T16:00Z|Start|Sandefjord|
+O|10-25T18:15Z|Molde|Fredrikstad|
+O|10-30T18:00Z|Bodo/Glimt|Viking|
+O|10-31T15:00Z|Fredrikstad|Rosenborg|
+O|10-31T17:00Z|Aalesund|Sandefjord|
+O|11-01T13:30Z|Brann|Molde|
+O|11-01T16:00Z|KFUM Oslo|HamKam|
+O|11-01T16:00Z|Sarpsborg 08|Kristiansund|
+O|11-01T16:00Z|Start|Lillestrom|
+O|11-01T18:15Z|Valerenga|Tromso|
+O|11-07T15:00Z|Kristiansund|Valerenga|
+O|11-07T17:00Z|Rosenborg|Start|
+O|11-08T13:30Z|Tromso|Bodo/Glimt|
+O|11-08T16:00Z|HamKam|Sarpsborg 08|
+O|11-08T16:00Z|Lillestrom|Aalesund|
+O|11-08T16:00Z|Sandefjord|Molde|
+O|11-08T16:00Z|Viking|KFUM Oslo|
+O|11-08T18:15Z|Fredrikstad|Brann|
+O|11-20T18:00Z|Molde|Bodo/Glimt|
+O|11-21T13:00Z|Tromso|Viking|
+O|11-21T15:00Z|HamKam|Fredrikstad|
+O|11-21T17:00Z|Valerenga|Start|
+O|11-22T16:00Z|Aalesund|Rosenborg|
+O|11-22T16:00Z|KFUM Oslo|Brann|
+O|11-22T16:00Z|Kristiansund|Sandefjord|
+O|11-22T18:15Z|Sarpsborg 08|Lillestrom|
+O|11-28T15:00Z|Bodo/Glimt|KFUM Oslo|
+O|11-28T17:00Z|Rosenborg|Molde|
+O|11-29T13:30Z|Fredrikstad|Aalesund|
+O|11-29T16:00Z|Brann|Kristiansund|
+O|11-29T16:00Z|Sandefjord|Tromso|
+O|11-29T16:00Z|Start|Sarpsborg 08|
+O|11-29T18:15Z|Viking|Valerenga|
+O|11-30T18:00Z|Lillestrom|HamKam|
+O|12-04T18:00Z|Molde|Viking|
+O|12-05T15:00Z|Aalesund|Bodo/Glimt|
+O|12-05T17:00Z|Valerenga|Rosenborg|
+O|12-06T13:30Z|Sarpsborg 08|Brann|
+O|12-06T16:00Z|KFUM Oslo|Fredrikstad|
+O|12-06T16:00Z|Kristiansund|Lillestrom|
+O|12-06T16:00Z|Tromso|Start|
+O|12-06T18:15Z|HamKam|Sandefjord|
+O|12-13T16:00Z|Bodo/Glimt|Sarpsborg 08|
+O|12-13T16:00Z|Brann|Aalesund|
+O|12-13T16:00Z|Fredrikstad|Molde|
+O|12-13T16:00Z|Lillestrom|Tromso|
+O|12-13T16:00Z|Rosenborg|KFUM Oslo|
+O|12-13T16:00Z|Sandefjord|Valerenga|
+O|12-13T16:00Z|Start|Kristiansund|
+O|12-13T16:00Z|Viking|HamKam|
+R|10-02T23:00Z|São Paulo|Santos|
+R|10-03T21:30Z|Atlético-MG|Bragantino|
+R|10-07T22:30Z|Bragantino|Mirassol|
+R|10-07T22:30Z|Internacional|Corinthians|
+R|10-07T22:30Z|Remo|Grêmio|
+R|10-07T23:00Z|Vitória|Chapecoense|
+R|10-07T23:30Z|Botafogo|Vasco|
+R|10-08T00:30Z|Cruzeiro|São Paulo|
+R|10-08T22:30Z|Santos|Flamengo|
+R|10-08T23:00Z|Athletico-PR|Atlético-MG|
+R|10-09T00:30Z|Fluminense|Coritiba|
+R|10-09T00:30Z|Palmeiras|Bahia|
+R|10-10T20:00Z|Vasco|Remo|
+R|10-10|São Paulo|Vitória|
+R|10-11T19:00Z|Atlético-MG|Santos|
+R|10-11T20:30Z|Grêmio|Internacional|
+R|10-11T20:30Z|Palmeiras|Corinthians|
+R|10-11T20:30Z|Flamengo|Fluminense|
+R|10-11T22:30Z|Bahia|Mirassol|
+R|10-12T19:00Z|Coritiba|Botafogo|
+R|10-12T22:30Z|Chapecoense|Athletico-PR|
+R|10-12|Bragantino|Cruzeiro|
+R|10-16T23:00Z|Mirassol|Internacional|
+R|10-17T21:00Z|Botafogo|Chapecoense|
+R|10-17T21:30Z|Atlético-MG|Coritiba|
+R|10-17T22:30Z|Athletico-PR|Palmeiras|
+R|10-17|São Paulo|Vasco|
+R|10-18T19:00Z|Grêmio|Cruzeiro|
+R|10-18T19:00Z|Fluminense|Santos|
+R|10-18T21:30Z|Bahia|Flamengo|
+R|10-18T22:30Z|Remo|Bragantino|
+R|10-19T23:00Z|Corinthians|Vitória|
+R|10-23T23:00Z|Cruzeiro|Remo|
+R|10-24T19:30Z|Mirassol|São Paulo|
+R|10-24T19:30Z|Vitória|Athletico-PR|
+R|10-24T19:30Z|Internacional|Botafogo|
+R|10-24T21:30Z|Palmeiras|Bragantino|
+R|10-24T21:30Z|Vasco|Corinthians|
+R|10-24T22:30Z|Chapecoense|Fluminense|
+R|10-24T23:00Z|Santos|Bahia|
+R|10-26T22:30Z|Coritiba|Grêmio|
+R|10-26T23:00Z|Flamengo|Atlético-MG|
+R|10-28T22:30Z|Bragantino|Chapecoense|
+R|10-28T22:30Z|Santos|Palmeiras|
+R|10-28T22:30Z|Fluminense|Internacional|
+R|10-29T00:30Z|Bahia|São Paulo|
+R|10-29T00:30Z|Remo|Botafogo|
+R|10-29T22:30Z|Coritiba|Vitória|
+R|10-29T22:30Z|Atlético-MG|Cruzeiro|
+R|10-29T23:00Z|Vasco|Flamengo|
+R|10-30T00:30Z|Grêmio|Athletico-PR|
+R|10-30T23:00Z|Corinthians|Mirassol|
+R|11-02T23:00Z|Bragantino|Santos|
+R|11-03T22:30Z|Chapecoense|Mirassol|
+R|11-03|São Paulo|Corinthians|
+R|11-03|Internacional|Coritiba|
+R|11-03|Athletico-PR|Vasco|
+R|11-03|Vitória|Fluminense|
+R|11-03|Palmeiras|Remo|
+R|11-03|Botafogo|Atlético-MG|
+R|11-03|Flamengo|Grêmio|
+R|11-03|Cruzeiro|Bahia|
+R|11-17|Mirassol|Atlético-MG|
+R|11-17|Vitória|Bragantino|
+R|11-17|Cruzeiro|Palmeiras|
+R|11-17|Coritiba|Santos|
+R|11-17|Corinthians|Botafogo|
+R|11-17|Remo|Chapecoense|
+R|11-17|Grêmio|Bahia|
+R|11-17|Vasco|Internacional|
+R|11-17|Flamengo|Athletico-PR|
+R|11-17|São Paulo|Fluminense|
+R|11-20|Internacional|Vitória|
+R|11-20|Santos|Grêmio|
+R|11-20|Fluminense|Mirassol|
+R|11-20|Atlético-MG|Corinthians|
+R|11-20|Botafogo|São Paulo|
+R|11-20|Bragantino|Vasco|
+R|11-20|Chapecoense|Cruzeiro|
+R|11-20|Bahia|Coritiba|
+R|11-20|Athletico-PR|Remo|
+R|11-20|Palmeiras|Flamengo|
+R|11-27|Mirassol|Athletico-PR|
+R|11-27|Internacional|Bragantino|
+R|11-27|Vitória|Santos|
+R|11-27|Chapecoense|Palmeiras|
+R|11-27|Coritiba|Flamengo|
+R|11-27|Fluminense|Cruzeiro|
+R|11-27|Atlético-MG|Vasco|
+R|11-27|Botafogo|Bahia|
+R|11-27|São Paulo|Remo|
+R|11-27|Corinthians|Grêmio|
+R|12-01|Palmeiras|Coritiba|
+R|12-01|Santos|Botafogo|
+R|12-01|Bahia|Atlético-MG|
+R|12-01|Grêmio|Mirassol|
+R|12-01|Vasco|Vitória|
+R|12-01|Flamengo|Chapecoense|
+R|12-01|Remo|Corinthians|
+R|12-01|Cruzeiro|Internacional|
+R|12-01|Athletico-PR|São Paulo|
+R|12-01|Bragantino|Fluminense|
+J|10-09|Beveren|Lommel|
+J|10-10|Cercle Brugge|Anderlecht|
+J|10-10|La Louvière|Club Brugge|
+J|10-10T18:45Z|Genk|Kortrijk|
+J|10-10|Zulte Waregem|Gent|
+J|10-11|Standard Liège|Charleroi|
+J|10-11|Union SG|OH Leuven|
+J|10-11|Westerlo|Antwerp|
+J|10-11|Mechelen|Sint-Truidense|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
+const LGC={"Premier League":"P","LaLiga":"E","La Liga":"E","Serie A":"S","Bundesliga":"B","Liga Portugal Betclic":"T","Primeira Liga":"T","Ligue 1":"F","Eredivisie":"V","UEFA Champions League":"C","UEFA Europa League":"U","Liga das Nações UEFA":"N","UEFA Conference League":"K","Jupiler Pro League":"J","Taça de Portugal":"Q","Eliteserien":"O","Campeonato Brasileiro Série A":"R","Brasileirão Série A":"R","Brasileirão":"R","Superliga":"D","Danish Superliga":"D","Superligaen":"D","Superliga Dinamarquesa":"D"};
+const AL={man:"manchester",nott:"nottingham",gladbach:"monchengladbach",hamburgo:"hamburger",colonia:"koln",estugarda:"stuttgart",marselha:"marseille",estrasburgo:"strasbourg"};
+const nz=x=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").split(/\s+/).filter(Boolean).map(t=>AL[t]||t);
+const same=(sel,n)=>{if(n==="PSG")n="Paris Saint-Germain";if(n==="Vitória SC")n="Vitória de Guimarães";const a=nz(sel);return nz(n).every(t=>a.includes(t))};
+const mine=(t,g)=>same(t,g.h)||same(t,g.a);
+const L5=t=>DS.filter(g=>g.r&&mine(t,g)).sort((x,y)=>x.d<y.d?1:-1).slice(0,5).map(g=>{const h=same(t,g.h),[a,b]=g.r.split("-").map(Number);return[h?g.a:g.h,h?"C":"F",h?a:b,h?b:a]});
+const nextDS=(t,l)=>{const G=DS.filter(g=>!g.r&&mine(t,g)&&new Date(g.d.length===10?g.d+"T23:59:59Z":g.d)>new Date()).sort((x,y)=>x.d<y.d?-1:1),C=G.filter(g=>g.L===LGC[l]),g=C[0]||G[0];return g?[g.h,g.a,g.d,null,null,null,g.d.length===10,"01/10/2026"]:null};
+const l5x=t=>SNAP.l5[t]||L5(t);
+const l5t=(t,a)=>a?t+" - últimos jogos de liga (mais recente primeiro; C=casa, F=fora): "+a.map(g=>g[0]+" "+g[1]+" "+g[2]+"-"+g[3]).join("; ")+". ":"";
+const CUPS={"Itália":["Coppa Italia",["Atalanta","Bologna","Cagliari","Como","Fiorentina","Frosinone","Genoa","Inter","Juventus","Lazio","Lecce","Milan","Monza","Napoli","Parma","Roma","Sassuolo","Torino","Udinese","Venezia","Arezzo","Ascoli","Avellino","Benevento","Carrarese","Catanzaro","Cesena","Cremonese","Empoli","Hellas Verona","Juve Stabia","Mantova","Modena","Padova","Palermo","Pisa","Sampdoria","Südtirol","Vicenza","Virtus Entella","Union Brescia"],/^(coppa italia|copa italia|copa da it[aá]lia)( |$)/i],
+"Espanha":["Copa del Rey",["Alavés","Athletic Bilbao","Atlético de Madrid","Barcelona","Celta de Vigo","Deportivo La Coruña","Elche","Espanyol","Getafe","Levante","Málaga","Osasuna","Racing Santander","Rayo Vallecano","Real Betis","Real Madrid","Real Sociedad","Sevilla","Valencia","Villarreal"],/^copa del rey( |$)/i]};
+const INTLT={"UEFA Champions League":["AEK Athens","Arsenal","Aston Villa","Atlético de Madrid","Barcelona","Bayern München","Bodø/Glimt","Borussia Dortmund","Club Brugge","Como","Fenerbahçe","Feyenoord","Galatasaray","Inter","LASK","Lens","Lille","Liverpool","Manchester City","Manchester United","Napoli","Paris Saint-Germain","Porto","PSV","RB Leipzig","Real Betis","Real Madrid","Roma","Sabah","Shakhtar Donetsk","Slavia Praga","Slovan Bratislava","Sporting CP","VfB Stuttgart","Viking","Villarreal"],
+"UEFA Europa League":["Anderlecht","Ararat-Armenia","AZ Alkmaar","Bayer Leverkusen","Benfica","Beşiktaş","Bournemouth","Celje","Celta de Vigo","Celtic","Crystal Palace","Dinamo Zagreb","Ferencváros","Hapoel Beer-Sheva","Hoffenheim","Jagiellonia","Juventus","Lech Poznań","Levski Sofia","Lillestrøm","Lyon","Marseille","Milan","NEC","OFI Creta","Olympiacos","Omonia","Real Sociedad","Rennes","Salzburg","Sparta Praga","Sturm Graz","Sunderland","Torreense","Union SG","Viktoria Plzeň"],
+"UEFA Conference League":["Aarhus","Ajax","Atalanta","Borac Banja Luka","Braga","Brann","Brighton","Copenhagen","Crvena Zvezda","CSKA Sofia","Egnatia","Gent","Getafe","Hajduk Split","Hearts","Iberia 1999","Inter Escaldes","Jablonec","Kairat Almaty","Kauno Žalgiris","KuPS","Lincoln Red Imps","Lugano","Midtjylland","Mjällby","Monaco","Nordsjælland","Panathinaikos","Pafos","Riga","SC Freiburg","Sint-Truidense","Thun","Trabzonspor","Twente","Universitatea Craiova"]};
+CUPS["Alemanha"]=["DFB-Pokal",TOP["Alemanha"][1].concat(["VfL Wolfsburg","FC St. Pauli","1. FC Heidenheim","Eintracht Braunschweig","SpVgg Greuther Fürth","Fortuna Düsseldorf","Preußen Münster","VfL Osnabrück","Energie Cottbus","Rot-Weiss Essen","MSV Duisburg","Waldhof Mannheim","1860 München","VSG Altglienicke","VfB Krieschow"]),/^dfb[- ]pokal( |$)/i];
+CUPS["Portugal"]=["Taça de Portugal",TOP["Portugal"][1].concat(["Salgueiros","Alcochetense","Tondela","Paredes","Belenenses","Fazendense","Mafra","União de Santarém","AVS","Lamelas","Sanjoanense","Alpendorada","Louletano","Fátima","Farense","Marco 09","União de Leiria","Bragança","Atlético CP","Vizela","Chaves","Marialvas","Vianense","Leixões","Penafiel","Leça","Felgueiras","Fafe","Olhanense","Oliveira do Hospital","Lusitânia de Lourosa","Limianos","Vitória de Setúbal","União da Serra"]),/^ta[cç]a de portugal( |$)/i];
+CUPS["Inglaterra"]=["FA Cup",TOP["Inglaterra"][1],/^fa cup( |$)/i];
+INTLT["Eurocopa"]=["Albânia","Alemanha","Andorra","Arménia","Áustria","Azerbaijão","Bélgica","Bielorrússia","Bósnia e Herzegovina","Bulgária","Cazaquistão","Chéquia","Chipre","Croácia","Dinamarca","Escócia","Eslováquia","Eslovénia","Espanha","Estónia","Finlândia","França","Geórgia","Gibraltar","Grécia","Hungria","Ilhas Faroé","Inglaterra","Irlanda","Irlanda do Norte","Islândia","Israel","Itália","Kosovo","Letónia","Liechtenstein","Lituânia","Luxemburgo","Macedónia do Norte","Malta","Moldávia","Montenegro","Noruega","País de Gales","Países Baixos","Polónia","Portugal","Roménia","San Marino","Sérvia","Suécia","Suíça","Turquia","Ucrânia"];
+const fillSel=(id,arr,ph)=>{$(id).innerHTML="<option value=''>"+ph+"</option>"+arr.map(x=>"<option>"+e(x)+"</option>").join("");$(id).disabled=!arr.length};
+fillSel("ct",PAISES,"Escolhe o país");
+const PL={"Portugal":["Liga Portugal Betclic","Taça de Portugal"],"Brasil":["Brasileirão"],"Inglaterra":["Premier League"],"Espanha":["LaLiga"],"Itália":["Serie A"],"Alemanha":["Bundesliga"],"França":["Ligue 1"],"Países Baixos":["Eredivisie"],"Bélgica":["Jupiler Pro League"],"Dinamarca":["Superliga"],"Noruega":["Eliteserien"]};
+const teamsOf=l=>{const L=LGC[l];if(!L)return[];const s=new Set();DS.forEach(g=>{if(g.L===L){s.add(g.h);s.add(g.a)}});return[...s].sort((x,y)=>x.localeCompare(y,"pt"))};
+$("m3").style.display="none";$("m3").previousElementSibling.style.display="none";$("src").parentElement.style.display="none";
+$("ct").addEventListener("change",()=>{
+ $("msg").textContent="";$("go").disabled=true;$("opw").style.display="none";fillSel("tm",[],"Escolhe a liga primeiro");
+ const c=$("ct").value;if(!c){fillSel("lg",[],"Escolhe o país primeiro");return}
+ if(c.startsWith("🌍")){fillSel("lg",INTL,"Escolhe a competição");return}
+ fillSel("lg",PL[c]||[],"Escolhe a liga");
+});
+$("lg").addEventListener("change",()=>{
+ $("msg").textContent="";$("go").disabled=true;$("opw").style.display="none";
+ const l=$("lg").value,c=$("ct").value;if(!l){fillSel("tm",[],"Escolhe a liga primeiro");return}
+ const CU=CUPS[c];if(CU&&l===CU[0]){fillSel("tm",CU[1],"Escolhe o time");return}
+ const T=TOP[c];if(T&&l===T[0]){fillSel("tm",T[1],"Escolhe o time");return}
+ if(c.startsWith("🌍")&&INTLT[l]){fillSel("tm",INTLT[l],"Escolhe o time");return}
+ const ts=teamsOf(l);
+ if(!ts.length){fillSel("tm",[],"Sem dados");$("msg").textContent="Ainda não tenho jogos guardados desta liga. Volta a tentar depois da próxima atualização.";return}
+ fillSel("tm",ts,"Escolhe o time");
+});
+$("tm").addEventListener("change",()=>{
+ const t=$("tm").value;$("go").disabled=!t;$("opw").style.display=t?"grid":"none";
+ const o=[...$("tm").options].map(x=>x.value).filter(v=>v&&v!==t);
+ $("op").innerHTML="<option value=''>Automático (calendário)</option>"+o.map(x=>"<option>"+e(x)+"</option>").join("");$("vn").value="";$("src").value="";
+});
+const sc=g=>{const p=String(g.r).split("-").map(Number);return p.length===2&&p.every(isFinite)?p:null};
+const statsOf=(t,L)=>{let G=DS.filter(g=>g.r&&sc(g)&&mine(t,g));const GL=G.filter(g=>g.L===L);if(GL.length>=3)G=GL;
+ return G.map(g=>{const h=same(t,g.h),[a,b]=sc(g);return{d:g.d,o:h?g.a:g.h,h,gf:h?a:b,ga:h?b:a}}).sort((x,y)=>x.d<y.d?1:-1)};
+const leagueAvg=L=>{if(!L)return 1.35;const R=DS.filter(g=>g.r&&g.L===L&&sc(g));if(R.length<8)return 1.35;return R.reduce((s,g)=>s+sc(g)[0]+sc(g)[1],0)/(2*R.length)};
+const lastN=(t,S)=>S.length?S.slice(0,5).map(g=>({o:e(g.o),h:g.h,gf:g.gf,ga:g.ga})):(l5x(t)||[]).map(g=>({o:e(g[0]),h:g[1]==="C",gf:g[2],ga:g[3]}));
+async function run(){
+ const lg=$("lg").value,tm=$("tm").value,ct=$("ct").value,op=$("op").value,vn=$("vn").value;
+ if(!ct||!lg||!tm){$("msg").textContent="Escolhe o país, a liga e o time.";return}
+ const L=LGC[lg]||null;
+ let fx=(SNAP.fx[lg]||[]).find(f=>(f[0]===tm||f[1]===tm)&&new Date(f[2])>new Date())||null;if(!fx)fx=nextDS(tm,lg);
+ let A,B,mineA,when=null,dOnly=false;
+ if(fx){mineA=fx[0]===tm||!!(fx[7]&&same(tm,fx[0]));A=fx[0];B=fx[1];when=fx[2];dOnly=!!fx[6]}
+ else if(op){mineA=vn!=="F";A=mineA?tm:op;B=mineA?op:tm}
+ else{$("opw").style.display="grid";$("msg").textContent="Não encontrei o próximo jogo deste time no calendário. Escolhe o adversário e o local aqui em baixo e carrega de novo.";return}
+ $("msg").textContent="";
+ try{
+  const SA=statsOf(A,L),SB=statsOf(B,L),La=lastN(A,SA),Lb=lastN(B,SB),avg=leagueAvg(L);
+  const real=!!(fx&&fx[3]!=null);
+  if(!SA.length&&!SB.length&&!La.length&&!Lb.length&&!real){$("msg").textContent="Não tenho resultados guardados destes times para calcular.";return}
+  const rate=(S,k)=>(S.reduce((s,g)=>s+g[k],0)+4*avg)/(S.length+4);
+  const fm=X=>1+((X.length?pts(X)/(X.length*3)*15:7.5)-7.5)/7.5*.1;
+  const lA=cl(rate(SA,"gf")*rate(SB,"ga")/avg*1.1*fm(La),.2,4,1.3);
+  const lB=cl(rate(SB,"gf")*rate(SA,"ga")/avg/1.1*fm(Lb),.2,4,1.3);
+  let w=0,d=0,l=0;
+  for(let i=0;i<=12;i++)for(let j=0;j<=12;j++){const p=P(lA,i)*P(lB,j);if(i>j)w+=p;else if(i==j)d+=p;else l+=p}
+  const t=w+d+l;w/=t;d/=t;l/=t;if(real){w=fx[3]/100;d=fx[4]/100;l=fx[5]/100}
+  const na=e(A),nb=e(B),lt=lA+lB,nm=mineA?na:nb,top=w>l?[na,w]:[nb,l];
+  $("ttl").textContent=na+" x "+nb;
+  $("mt").textContent=(when?(dOnly?new Date(when).toLocaleDateString("pt-PT")+" (hora por confirmar)":new Date(when).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"}))+" · ":"")+nm+" é o time pedido · "+lt.toFixed(2)+" golos esperados";
+  $("fv").textContent="Favorito: "+top[0]+" ("+Math.round(top[1]*100)+"% de vitória)";
+  $("m1").innerHTML=row("Vitória "+na,w)+row("Empate",d)+row("Vitória "+nb,l)+row("Derrota "+na,l)+row("Derrota "+nb,w);
+  $("m2").innerHTML=[0.5,1.5,2.5,3.5,4.5,5.5].map(x=>row("Mais de "+String(x).replace(".",",")+" golos",ov(lt,x))).join("");
+  $("t1").textContent="Últimos 5 de "+na+" ("+pts(La)+" pts, "+La.reduce((s,g)=>s+g.gf,0)+" golos marcados)";
+  $("l1").innerHTML=gamesHtml(La);
+  $("t2").textContent="Últimos 5 de "+nb+" ("+pts(Lb)+" pts, "+Lb.reduce((s,g)=>s+g.gf,0)+" golos marcados)";
+  $("l2").innerHTML=gamesHtml(Lb);
+  $("dn").textContent=(fx?(real?"Adversário, data e probabilidades 1X2 reais (fonte de dados, "+SNAP.d+"). ":"Adversário e data do calendário guardado na página. "):"Adversário escolhido por ti (confirma no calendário oficial). ")+"Últimos jogos: resultados reais guardados na página ("+SA.length+" jogos de "+na+" e "+SB.length+" de "+nb+" entram no modelo). Golos: modelo estatístico. Cantos: sem dados, por isso não aparecem.";
+  $("res").style.display="block";$("res").scrollIntoView({behavior:"smooth",block:"nearest"});
+ }catch(err){
+  $("msg").textContent="Não consegui calcular ("+((err&&(err.code||err.message))||"erro")+"). Tenta de novo."
+ }finally{$("go").disabled=!$("tm").value;$("go").textContent="Analisar próximo jogo"}
+}
+$("go").addEventListener("click",run);
+</script>
+</body>
+</html>
