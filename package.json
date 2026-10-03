@@ -1,0 +1,33 @@
+{
+  "name": "previsor-de-jogos",
+  "version": "1.0.0",
+  "description": "Previsor de jogos de futebol",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Previsor",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^38.2.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.previsor.jogos",
+    "productName": "Previsor de Jogos",
+    "files": [
+      "main.js",
+      "index.html",
+      "manifest.json",
+      "service-worker.js",
+      "atualizar_previsor.py"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
