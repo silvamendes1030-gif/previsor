@@ -2154,8 +2154,7 @@ async function run(){
   $("ttl").textContent=na+" x "+nb;
   $("mt").textContent=(when?(dOnly?new Date(when).toLocaleDateString("pt-PT")+" (hora por confirmar)":new Date(when).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"}))+" · ":"")+nm+" é o time pedido · "+lt.toFixed(2)+" golos esperados";
   $("fv").textContent="Favorito: "+top[0]+" ("+Math.round(top[1]*100)+"% de vitória)";
-  $("m1").innerHTML=row("Vitória "+na,w)+row("Empate",d)+row("Vitória "+nb,l);  $("m1").innerHTML=row("Vitória "+na,w)+row("Empate",d)+row("Vitória "+nb,l)+row("Derrota "+na,l)+row("Derrota "+nb,w);
-  $("m2").innerHTML=[0.5,1.5,2.5,3.5,4.5,5.5].map(x=>row("Mais de "+String(x).replace(".",",")+" golos",ov(lt,x))).join("");
+  $("m1").innerHTML=row("Vitória "+na,w)+row("Empate",d)+row("Vitória "+nb,l);  $("m2").innerHTML=[0.5,1.5,2.5,3.5,4.5,5.5].map(x=>row("Mais de "+String(x).replace(".",",")+" golos",ov(lt,x))).join("");
   $("t1").textContent="Últimos 5 de "+na+" ("+pts(La)+" pts, "+La.reduce((s,g)=>s+g.gf,0)+" golos marcados)";
   $("l1").innerHTML=gamesHtml(La);
   $("t2").textContent="Últimos 5 de "+nb+" ("+pts(Lb)+" pts, "+Lb.reduce((s,g)=>s+g.gf,0)+" golos marcados)";
