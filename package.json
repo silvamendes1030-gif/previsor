@@ -20,14 +20,17 @@
       "main.js",
       "index.html",
       "manifest.json",
-      "service-worker.js",
-      "atualizar_previsor.py"
+      "service-worker.js"
     ],
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "category": "public.app-category.sports"
     },
     "win": {
       "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
     }
   }
 }
