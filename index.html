@@ -261,7 +261,7 @@ P|10-10T14:00Z|Aston Villa|Brentford|2-2
 P|10-10T16:30Z|Manchester United|Tottenham|1-1
 P|10-11T13:00Z|Hull City|Everton|2-2
 P|10-11T13:00Z|Crystal Palace|Nottingham|3-1
-P|10-11T15:30Z|Liverpool|Manchester City|
+P|10-11T15:30Z|Liverpool|Manchester City|0-3
 P|10-12T19:00Z|Coventry City|Newcastle|
 P|10-17T11:30Z|Everton|Chelsea|
 P|10-17T14:00Z|Fulham|Hull City|
@@ -697,7 +697,7 @@ B|10-10T13:30Z|Hoffenheim|Hamburger SV|2-3
 B|10-10T13:30Z|Augsburg|Bayern|2-2
 B|10-10T16:30Z|RB Leipzig|Frankfurt|6-0
 B|10-11T13:30Z|1. FC Köln|Borussia Mönchengladbach|2-1
-B|10-11T15:30Z|Freiburg|Schalke|
+B|10-11T15:30Z|Freiburg|Schalke|2-1
 B|10-16T18:30Z|Frankfurt|1. FC Köln|
 B|10-17T13:30Z|Union Berlin|Dortmund|
 B|10-17T13:30Z|Hamburger SV|Stuttgart|
@@ -1060,7 +1060,7 @@ S|10-10T18:45Z|Napoli|Frosinone|3-0
 S|10-11T10:30Z|Como|Roma|0-0
 S|10-11T13:00Z|Lecce|Bologna|1-2
 S|10-11T13:00Z|Lazio|Monza|3-1
-S|10-11T16:00Z|Sassuolo|Milan|
+S|10-11T16:00Z|Sassuolo|Milan|1-1
 S|10-11T18:45Z|Cagliari|Juventus|
 S|10-12T16:30Z|Atalanta|Venezia|
 S|10-12T18:45Z|Torino|Udinese|
@@ -1276,7 +1276,7 @@ F|10-10T18:45Z|Lorient|Paris FC|1-0
 F|10-10T18:45Z|PSG|Le Mans|3-1
 F|10-10T18:45Z|Monaco|Toulouse|2-2
 F|10-11T13:00Z|Nice|Strasbourg|2-1
-F|10-11T15:15Z|Rennes|Auxerre|
+F|10-11T15:15Z|Rennes|Auxerre|4-1
 F|10-11T18:45Z|Troyes|Marseille|
 F|10-16T18:45Z|Le Mans|Toulouse|
 F|10-17T15:15Z|Strasbourg|PSG|
@@ -1772,7 +1772,7 @@ D|08-09T16:00Z|AC Horsens|Brøndby|0-2
 D|10-11T12:00Z|Randers FC|Viborg|
 D|10-11T12:00Z|Silkeborg IF|AC Horsens|1-2
 D|10-11T14:00Z|Brøndby|Lyngby|4-0
-D|10-11T16:00Z|FC Midtjylland|FC Copenhagen|1-1
+D|10-11T16:00Z|FC Midtjylland|FC Copenhagen|2-1
 D|10-12T17:00Z|AGF Aarhus|Sønderjyske|
 O|09-18|Sarpsborg 08|KFUM Oslo|1-3
 O|09-19|Kristiansund|Rosenborg|1-3
@@ -1858,7 +1858,8 @@ O|09-20T17:15Z|Brann|Bodø/Glimt|2-1
 O|10-10T14:00Z|Bodø/Glimt|Kristiansund|1-0
 O|10-11T12:30Z|Fredrikstad|Tromsø|1-1
 O|10-11T15:00Z|Start|Hamarkameratene|2-4
-O|10-11T17:15Z|Lillestrøm|Molde|
+O|10-11T17:15Z|Lillestrøm|Molde|1-2
+O|10-12T17:00Z|KFUM-Kameratene Oslo|Vålerenga|
 R|07-16T22:30Z|Botafogo|Santos|2-1
 R|07-16T22:30Z|Vitória|Vasco da Gama|1-0
 R|07-17T22:30Z|Bahia|Chapecoense|2-0
@@ -2075,7 +2076,7 @@ J|10-10T18:45Z|Zulte Waregem|Gent|
 J|10-11T11:30Z|Standard Liège|Charleroi|0-1
 J|10-11T14:00Z|Union SG|OH Leuven|1-1
 J|10-11T16:30Z|Westerlo|Antwerp|0-1
-J|10-11T17:15Z|Mechelen|Sint-Truidense|
+J|10-11T17:15Z|Mechelen|Sint-Truidense|3-1
 J|08-07T18:45Z|Club Brugge|Kortrijk|3-0
 J|08-08T16:15Z|Standard Liège|Cercle Brugge|2-2
 J|08-08T18:45Z|Westerlo|Union SG|1-5
@@ -2090,7 +2091,8 @@ J|08-15T14:00Z|Union SG|Zulte Waregem|0-0
 J|08-15T16:15Z|Kortrijk|Antwerp|0-3
 J|08-15T18:45Z|OH Leuven|Club Brugge|0-3
 J|08-15T18:45Z|Genk|Westerlo|3-2
-J|08-16T11:30Z|Beveren|Anderlecht|1-0`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
+J|08-16T11:30Z|Beveren|Anderlecht|1-0
+J|10-23T18:45Z|Kortrijk|Mechelen|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
 const LGC={"Premier League":"P","LaLiga":"E","La Liga":"E","Serie A":"S","Bundesliga":"B","Liga Portugal Betclic":"T","Primeira Liga":"T","Ligue 1":"F","Eredivisie":"V","UEFA Champions League":"C","UEFA Europa League":"U","Liga das Nações UEFA":"N","UEFA Conference League":"K","Jupiler Pro League":"J","Taça de Portugal":"Q","Eliteserien":"O","Campeonato Brasileiro Série A":"R","Brasileirão Série A":"R","Brasileirão":"R","Superliga":"D","Danish Superliga":"D","Superligaen":"D","Superliga Dinamarquesa":"D"};
 const AL={man:"manchester",nott:"nottingham",gladbach:"monchengladbach",hamburgo:"hamburger",colonia:"koln",estugarda:"stuttgart",marselha:"marseille",estrasburgo:"strasbourg"};
 const nz=x=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").split(/\s+/).filter(Boolean).map(t=>AL[t]||t);
