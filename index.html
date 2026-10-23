@@ -1467,7 +1467,7 @@ V|10-18T12:30Z|Cambuur|AZ|2-2
 V|10-18T14:45Z|Groningen|Ajax|2-5
 V|10-18T18:00Z|Twente|Utrecht|1-2
 V|10-18T18:00Z|NEC|Sittard|2-2
-V|10-23T18:00Z|Go Ahead|Telstar|
+V|10-23T18:00Z|Go Ahead|Telstar|3-2
 V|10-24T14:30Z|Utrecht|Zwolle|
 V|10-24T16:45Z|Willem II|Cambuur|
 V|10-24T19:00Z|Den Haag|Heerenveen|
@@ -2112,7 +2112,8 @@ J|08-15T16:15Z|Kortrijk|Antwerp|0-3
 J|08-15T18:45Z|OH Leuven|Club Brugge|0-3
 J|08-15T18:45Z|Genk|Westerlo|3-2
 J|08-16T11:30Z|Beveren|Anderlecht|1-0
-J|10-23T18:45Z|Kortrijk|Mechelen|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
+J|10-23T18:45Z|Kortrijk|Mechelen|
+J|10-24T14:00Z|Antwerp|Charleroi|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
 const LGC={"Premier League":"P","LaLiga":"E","La Liga":"E","Serie A":"S","Bundesliga":"B","Liga Portugal Betclic":"T","Primeira Liga":"T","Ligue 1":"F","Eredivisie":"V","UEFA Champions League":"C","UEFA Europa League":"U","Liga das Nações UEFA":"N","UEFA Conference League":"K","Jupiler Pro League":"J","Taça de Portugal":"Q","Eliteserien":"O","Campeonato Brasileiro Série A":"R","Brasileirão Série A":"R","Brasileirão":"R","Superliga":"D","Danish Superliga":"D","Superligaen":"D","Superliga Dinamarquesa":"D"};
 const AL={man:"manchester",nott:"nottingham",gladbach:"monchengladbach",hamburgo:"hamburger",colonia:"koln",estugarda:"stuttgart",marselha:"marseille",estrasburgo:"strasbourg"};
 const nz=x=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").split(/\s+/).filter(Boolean).map(t=>AL[t]||t);
