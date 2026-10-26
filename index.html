@@ -2126,7 +2126,8 @@ J|10-24T16:15Z|OH Leuven|Lommel|
 J|10-24T18:45Z|Westerlo|Beveren|
 J|10-25T12:30Z|Genk|Standard Liège|2-1
 J|10-24T18:45Z|La Louvière|Zulte Waregem|3-0
-J|10-25T15:00Z|Club Brugge|Sint-Truidense|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
+J|10-25T15:00Z|Club Brugge|Sint-Truidense|
+J|10-30T19:45Z|Zulte Waregem|Club Brugge|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
 const LGC={"Premier League":"P","LaLiga":"E","La Liga":"E","Serie A":"S","Bundesliga":"B","Liga Portugal Betclic":"T","Primeira Liga":"T","Ligue 1":"F","Eredivisie":"V","UEFA Champions League":"C","UEFA Europa League":"U","Liga das Nações UEFA":"N","UEFA Conference League":"K","Jupiler Pro League":"J","Taça de Portugal":"Q","Eliteserien":"O","Campeonato Brasileiro Série A":"R","Brasileirão Série A":"R","Brasileirão":"R","Superliga":"D","Danish Superliga":"D","Superligaen":"D","Superliga Dinamarquesa":"D"};
 const AL={man:"manchester",nott:"nottingham",gladbach:"monchengladbach",hamburgo:"hamburger",colonia:"koln",estugarda:"stuttgart",marselha:"marseille",estrasburgo:"strasbourg"};
 const nz=x=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").split(/\s+/).filter(Boolean).map(t=>AL[t]||t);
