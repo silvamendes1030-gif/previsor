@@ -290,7 +290,7 @@ P|10-31T15:00Z|Coventry City|Sunderland|3-1
 P|10-31T15:00Z|Hull City|Ipswich Town|2-2
 P|10-31T15:00Z|Brentford|Nottingham|2-0
 P|10-31T17:30Z|Tottenham|Crystal Palace|2-0
-P|10-31T20:00Z|Aston Villa|Fulham|
+P|10-31T20:00Z|Aston Villa|Fulham|1-1
 P|11-01T16:30Z|Liverpool|Arsenal|
 P|11-02T20:00Z|Newcastle|Everton|
 P|11-06T20:00Z|Everton|Coventry City|
@@ -536,7 +536,7 @@ E|10-30T20:00Z|Villarreal|Espanyol|0-1
 E|10-31T13:00Z|Levante|Atlético de Madrid|0-2
 E|10-31T15:15Z|Rayo Vallecano|Celta|3-0
 E|10-31T17:30Z|Real Betis|Málaga|2-1
-E|10-31T20:00Z|Arouca|Alavés|
+E|10-31T20:00Z|Arouca|Alavés|6-1
 E|11-01T13:00Z|Getafe|Sevilla|
 E|11-01T15:15Z|Santander|Real Madrid|
 E|11-01T17:30Z|Elche|Valencia|
@@ -1094,9 +1094,9 @@ S|10-28T19:45Z|Genoa|Juventus|2-0
 S|10-28T19:45Z|Monza|Napoli|1-4
 S|10-29T17:30Z|Frosinone|Lecce|5-1
 S|10-29T19:45Z|Fiorentina|Atalanta|2-2
-S|10-31T14:00Z|Bologna|Monza|
-S|10-31T17:00Z|Udinese|Roma|
-S|10-31T19:45Z|Milan|Inter|
+S|10-31T14:00Z|Bologna|Monza|2-1
+S|10-31T17:00Z|Udinese|Roma|2-5
+S|10-31T19:45Z|Milan|Inter|3-1
 S|11-01T11:30Z|Como|Venezia|
 S|11-01T14:00Z|Frosinone|Torino|
 S|11-01T14:00Z|Lazio|Cagliari|
@@ -1299,7 +1299,7 @@ F|10-26T19:30Z|PSG|Lyon|2-0
 F|10-30T18:00Z|Le Havre|PSG|1-5
 F|10-30T18:00Z|Nice|Rennes|5-2
 F|10-30T20:05Z|Lille|Lens|1-0
-F|10-31T19:45Z|Troyes|Le Mans|
+F|10-31T19:45Z|Troyes|Le Mans|2-0
 F|11-01T14:00Z|Strasbourg|Auxerre|
 F|11-01T16:15Z|Lyon|Angers|
 F|11-01T16:15Z|Paris FC|Monaco|
@@ -1477,10 +1477,10 @@ V|10-25T13:30Z|PSV|Feyenoord|1-1
 V|10-25T15:45Z|Sparta|Ajax|1-2
 V|10-25T19:00Z|AZ|Twente|0-2
 V|10-31T15:30Z|Feyenoord|Sittard|1-1
-V|10-31T17:45Z|Heerenveen|NEC|
+V|10-31T17:45Z|Heerenveen|NEC|1-0
 V|10-31T17:45Z|PSV|Willem II|7-0
-V|10-31T20:00Z|Cambuur|Go Ahead|
-V|10-31T20:00Z|Ajax|AZ|
+V|10-31T20:00Z|Cambuur|Go Ahead|4-0
+V|10-31T20:00Z|Ajax|AZ|1-0
 V|11-01T11:15Z|Zwolle|Den Haag|
 V|11-01T13:30Z|Telstar|Utrecht|
 V|11-01T13:30Z|Excelsior|Twente|
@@ -2042,7 +2042,7 @@ R|10-29T22:30Z|Mineiro|Cruzeiro|0-1
 R|10-29T23:00Z|Vasco da Gama|Flamengo|1-4
 R|10-30T00:30Z|Grêmio|Paranaense|2-0
 R|10-30T23:00Z|Corinthians|Mirassol|2-0
-R|10-31T19:00Z|Coritiba|Vitória|
+R|10-31T19:00Z|Coritiba|Vitória|2-0
 R|11-02T23:00Z|Bragantino|Santos|
 R|11-03T22:30Z|Chapecoense|Mirassol|
 R|11-04T00:30Z|Internacional|Coritiba|
@@ -2131,7 +2131,8 @@ J|10-24T18:45Z|La Louvière|Zulte Waregem|3-0
 J|10-25T15:00Z|Club Brugge|Sint-Truidense|
 J|10-30T19:45Z|Zulte Waregem|Club Brugge|2-4
 J|10-25T18:15Z|Union SG|Cercle Brugge|5-2
-J|10-31T15:00Z|Mechelen|Genk|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
+J|10-31T15:00Z|Mechelen|Genk|
+J|11-01T12:30Z|Cercle Brugge|Antwerp|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
 const LGC={"Premier League":"P","LaLiga":"E","La Liga":"E","Serie A":"S","Bundesliga":"B","Liga Portugal Betclic":"T","Primeira Liga":"T","Ligue 1":"F","Eredivisie":"V","UEFA Champions League":"C","UEFA Europa League":"U","Liga das Nações UEFA":"N","UEFA Conference League":"K","Jupiler Pro League":"J","Taça de Portugal":"Q","Eliteserien":"O","Campeonato Brasileiro Série A":"R","Brasileirão Série A":"R","Brasileirão":"R","Superliga":"D","Danish Superliga":"D","Superligaen":"D","Superliga Dinamarquesa":"D"};
 const AL={man:"manchester",nott:"nottingham",gladbach:"monchengladbach",hamburgo:"hamburger",colonia:"koln",estugarda:"stuttgart",marselha:"marseille",estrasburgo:"strasbourg"};
 const nz=x=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").split(/\s+/).filter(Boolean).map(t=>AL[t]||t);
