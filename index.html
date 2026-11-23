@@ -584,16 +584,16 @@ E|12-06T17:30Z|Getafe|Valencia|
 E|12-06T20:00Z|Atlético de Madrid|Real Betis|
 E|12-07T20:00Z|Sevilla|Málaga|
 E|12-09T19:00Z|Rayo Vallecano|Athletic|
-E|12-13T00:00Z|Espanyol|Celta|
-E|12-13T00:00Z|Málaga|Arouca|
-E|12-13T00:00Z|Real Madrid|Osasuna|
-E|12-13T00:00Z|Deportivo|Athletic|
-E|12-13T00:00Z|Levante|Alavés|
-E|12-13T00:00Z|Elche|Sevilla|
-E|12-13T00:00Z|Villarreal|Rayo Vallecano|
-E|12-13T00:00Z|Real Betis|Santander|
-E|12-13T00:00Z|Real Sociedad|Getafe|
-E|12-13T00:00Z|Atlético de Madrid|Valencia|
+E|12-11T20:00Z|Elche|Sevilla|
+E|12-12T13:00Z|Levante|Alavés|
+E|12-12T15:15Z|Villarreal|Rayo Vallecano|
+E|12-12T17:30Z|Málaga|Arouca|
+E|12-12T20:00Z|Real Betis|Santander|
+E|12-13T13:00Z|Atlético de Madrid|Valencia|
+E|12-13T15:15Z|Deportivo|Athletic|
+E|12-13T17:30Z|Real Sociedad|Getafe|
+E|12-13T20:00Z|Real Madrid|Osasuna|
+E|12-14T20:00Z|Espanyol|Celta|
 E|12-20T00:00Z|Athletic|Real Betis|
 E|12-20T00:00Z|Getafe|Levante|
 E|12-20T00:00Z|Alavés|Elche|
@@ -1812,7 +1812,8 @@ D|11-08T17:00Z|FC Midtjylland|Sønderjyske|2-2
 D|11-20T18:00Z|AGF Aarhus|Lyngby|2-1
 D|11-22T13:00Z|AC Horsens|Silkeborg IF|
 D|11-22T17:00Z|FC Nordsjælland|FC Copenhagen|5-0
-D|11-23T18:00Z|Brøndby|FC Midtjylland|
+D|11-23T18:00Z|Brøndby|FC Midtjylland|0-2
+D|11-27T18:00Z|Sønderjyske|Brøndby|
 O|09-18|Sarpsborg 08|KFUM Oslo|1-3
 O|09-19|Kristiansund|Rosenborg|1-3
 O|09-19|Molde|Aalesund|1-2
@@ -2167,7 +2168,8 @@ J|11-08T17:30Z|Union SG|Genk|
 J|11-20T19:45Z|Cercle Brugge|Westerlo|
 J|11-08T18:15Z|Sint-Truidense|Zulte Waregem|4-1
 J|11-21T15:00Z|Charleroi|Sint-Truidense|
-J|11-22T12:30Z|Beveren|Gent|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
+J|11-22T12:30Z|Beveren|Gent|
+J|11-27T19:45Z|OH Leuven|Kortrijk|`.split("\n").map(l=>{const[L,d,h,a,r]=l.split("|");return{L,d:(d.startsWith("01")?"2027-":"2026-")+d,h,a,r:r||null}});
 const LGC={"Premier League":"P","LaLiga":"E","La Liga":"E","Serie A":"S","Bundesliga":"B","Liga Portugal Betclic":"T","Primeira Liga":"T","Ligue 1":"F","Eredivisie":"V","UEFA Champions League":"C","UEFA Europa League":"U","Liga das Nações UEFA":"N","UEFA Conference League":"K","Jupiler Pro League":"J","Taça de Portugal":"Q","Eliteserien":"O","Campeonato Brasileiro Série A":"R","Brasileirão Série A":"R","Brasileirão":"R","Superliga":"D","Danish Superliga":"D","Superligaen":"D","Superliga Dinamarquesa":"D"};
 const AL={man:"manchester",nott:"nottingham",gladbach:"monchengladbach",hamburgo:"hamburger",colonia:"koln",estugarda:"stuttgart",marselha:"marseille",estrasburgo:"strasbourg"};
 const nz=x=>x.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\./g,"").split(/\s+/).filter(Boolean).map(t=>AL[t]||t);
